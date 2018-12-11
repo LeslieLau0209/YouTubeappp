@@ -21,6 +21,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -95,7 +96,7 @@ public class ChannelFragment extends Fragment {
                 try {
                     JSONObject jsonObject = new JSONObject(str);
                     Log.e("response", jsonObject.toString());
-//                    mListData = parseVideoListFromResponse(jsonObject);
+                    mListData = parseVideoListFromResponse(jsonObject);
                     init(mListData);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -103,7 +104,49 @@ public class ChannelFragment extends Fragment {
             }
         }
     }
+    public ArrayList<YoutubeDataModel> parseVideoListFromResponse(JSONObject jsonObject) {
+        ArrayList<YoutubeDataModel> mList = new ArrayList<>();
 
+        if (jsonObject.has("items")) {
+            try {
+                JSONArray jsonArray = jsonObject.getJSONArray("items");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject json = jsonArray.getJSONObject(i);
+                    if (json.has("id")) {
+                        JSONObject jsonID = json.getJSONObject("id");
+                        String video_id = "";
+                        if (jsonID.has("videoId")) {
+                            video_id = jsonID.getString("videoId");
+                        }
+                        if (jsonID.has("kind")) {
+                            if (jsonID.getString("kind").equals("youtube#video")) {
+                                YoutubeDataModel youtubeObject = new YoutubeDataModel();
+                                JSONObject jsonSnippet = json.getJSONObject("snippet");
+                                String title = jsonSnippet.getString("title");
+                                String description = jsonSnippet.getString("description");
+                                String publishedAt = jsonSnippet.getString("publishedAt");
+                                String thumbnail = jsonSnippet.getJSONObject("thumbnails").getJSONObject("high").getString("url");
+
+                                youtubeObject.setTitle(title);
+                                youtubeObject.setDescription(description);
+                                youtubeObject.setPublishedAt(publishedAt);
+                                youtubeObject.setThumbnail(thumbnail);
+                                youtubeObject.setVideo_id(video_id);
+                                mList.add(youtubeObject);
+
+                            }
+                        }
+                    }
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return mList;
+
+    }
 //    private ArrayList<YoutubeDataModel> parseVideoListFromResponse(JSONObject jsonObject) {
 //        ArrayList<YoutubeDataModel> mList = new ArrayList<>();
 //        if (jsonObject.has("items")) {
