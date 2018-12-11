@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.example.haoliu.youtubeappp.Model.YoutubeDataModel;
 import com.example.haoliu.youtubeappp.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -42,6 +43,9 @@ public class VideoPostAdapter extends RecyclerView.Adapter<VideoPostAdapter.Yout
         textViewTitle.setText(Object.getTitle());
         textViewTitle.setText(Object.getDescription());
         textViewTitle.setText(Object.getPublishedAt());
+        //TODO:这里可能有问题
+        Picasso.get().load(Object.getThumbnail()).into(ImageThumb);
+
 
     }
 
